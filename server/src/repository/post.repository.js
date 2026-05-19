@@ -112,7 +112,12 @@ class PostRepository {
                             $cond: [
                                 { $isArray: '$upvotes' },
                                 { $size: { $ifNull: ['$upvotes', []] } },
-                                { $ifNull: ['$upvotes', 0] },
+                                {
+                                    $ifNull: [
+                                        '$upvoteCount',
+                                        { $ifNull: ['$upvotes', { $ifNull: ['$votes', 0] }] }
+                                    ]
+                                },
                             ],
                         },
                         downvoteCount: {
@@ -121,6 +126,16 @@ class PostRepository {
                                 { $size: { $ifNull: ['$downvotes', []] } },
                                 { $ifNull: ['$downvotes', 0] },
                             ],
+                        },
+                        answerCount: {
+                            $cond: [
+                                { $isArray: '$answers' },
+                                { $size: { $ifNull: ['$answers', []] } },
+                                { $ifNull: ['$answerCount', 0] },
+                            ],
+                        },
+                        viewCount: {
+                            $ifNull: ['$viewCount', { $ifNull: ['$views', 0] }]
                         },
                     },
                 },
@@ -139,6 +154,7 @@ class PostRepository {
                 {
                     $project: {
                         title: 1,
+                        summary: 1,
                         content: 1,
                         tags: 1,
                         status: 1,
@@ -146,6 +162,7 @@ class PostRepository {
                         viewCount: 1,
                         upvoteCount: 1,
                         downvoteCount: 1,
+                        answerCount: 1,
                         createdAt: 1,
                         author: { fullName: 1, avatar: 1 },
                     },
@@ -155,16 +172,21 @@ class PostRepository {
             return await Post.aggregate(pipeline);
         }
 
-        async findHotNetworkQuestions(limit = 10) {
-            return await Post.aggregate([
-                { $match: { status: { $ne: 'deleted' } } },
-                {
+    async findHotNetworkQuestions(limit = 10) {
+        return await Post.aggregate([
+            { $match: { status: { $ne: 'deleted' } } },
+            {
                     $addFields: {
                         upvoteCount: {
                             $cond: [
                                 { $isArray: '$upvotes' },
                                 { $size: { $ifNull: ['$upvotes', []] } },
-                                { $ifNull: ['$upvotes', 0] },
+                                {
+                                    $ifNull: [
+                                        '$upvoteCount',
+                                        { $ifNull: ['$upvotes', { $ifNull: ['$votes', 0] }] }
+                                    ]
+                                },
                             ],
                         },
                     },
@@ -175,6 +197,95 @@ class PostRepository {
                     $project: {
                         _id: 1,
                         title: 1,
+                    },
+                },
+            ]);
+        }
+
+        async findTopUpvotedPosts(limit = 10) {
+            return await Post.aggregate([
+                { $match: { status: { $ne: 'deleted' } } },
+                {
+                    $addFields: {
+                        upvoteCount: {
+                            $cond: [
+                                { $isArray: '$upvotes' },
+                                { $size: { $ifNull: ['$upvotes', []] } },
+                                {
+                                    $ifNull: [
+                                        '$upvoteCount',
+                                        { $ifNull: ['$upvotes', { $ifNull: ['$votes', 0] }] }
+                                    ]
+                                },
+                            ],
+                        },
+                    },
+                },
+                { $sort: { upvoteCount: -1, viewCount: -1, createdAt: -1 } },
+                { $limit: limit },
+                {
+                    $project: {
+                        _id: 1,
+                        title: 1,
+                        upvoteCount: 1,
+                    },
+                },
+            ]);
+        }
+        
+        async findTopUpvotedPostsOfDay(limit = 10) {
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
+
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+
+            return await Post.aggregate([
+                { 
+                    $match: { 
+                        status: { $ne: 'deleted' },
+                        createdAt: { $gte: startOfDay, $lte: endOfDay }
+                    } 
+                },
+                {
+                    $addFields: {
+                        upvoteCount: {
+                            $cond: [
+                                { $isArray: '$upvotes' },
+                                { $size: { $ifNull: ['$upvotes', []] } },
+                                {
+                                    $ifNull: [
+                                        '$upvoteCount',
+                                        { $ifNull: ['$upvotes', { $ifNull: ['$votes', 0] }] }
+                                    ]
+                                },
+                            ],
+                        },
+                        viewCount: {
+                            $ifNull: ['$viewCount', { $ifNull: ['$views', 0] }]
+                        },
+                    },
+                },
+                { $sort: { upvoteCount: -1, viewCount: -1, createdAt: -1 } },
+                { $limit: limit },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'author',
+                        foreignField: '_id',
+                        as: 'author',
+                    },
+                },
+                { $unwind: { path: '$author', preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        _id: 1,
+                        title: 1,
+                        upvoteCount: 1,
+                        viewCount: 1,
+                        createdAt: 1,
+                        tags: 1,
+                        author: { fullName: 1, avatar: 1 },
                     },
                 },
             ]);

@@ -14,6 +14,7 @@ export default function ForumLayout() {
         handleSearch,
         handleApplyFilters,
         handleClearFilters,
+        refetch,
     } = usePostFilters();
 
     return (
@@ -29,7 +30,10 @@ export default function ForumLayout() {
                 <Outlet context={{
                     filters,
                     handleFilterChange,
+                    handleSearch,
                     handleApplyFilters,
+                    handleClearFilters,
+                    refetch,
                 }} />
 
                 <RightSidebar

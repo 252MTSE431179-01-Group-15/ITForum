@@ -229,6 +229,10 @@ class PostService {
         };
     }
 
+    async getTopPosts() {
+        return await postRepository.findTopUpvotedPostsOfDay(10);
+    }
+
     // ==================== HELPER: Xây dựng cây comment ====================
     _buildCommentTree(comments) {
         const commentMap = {};

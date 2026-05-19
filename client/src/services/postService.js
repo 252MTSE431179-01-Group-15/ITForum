@@ -29,3 +29,7 @@ export const getRelatedPosts = (tag, excludePostId) =>
 // API 5: Du lieu sidebar ben phai cho trang chi tiet
 export const getPostDetailSidebarData = () =>
   apiClient.get('/posts/sidebar');
+
+// API 6: Lấy top 10 bài viết trong ngày
+export const getTopPosts = () =>
+  apiClient.get('/posts/top');

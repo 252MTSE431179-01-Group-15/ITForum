@@ -3,7 +3,7 @@ import ForumLayout from './components/layout/ForumLayout';
 import PostDetailLayout from './components/layout/PostDetailLayout';
 import AuthShellLayout from './components/layout/AuthShellLayout';
 import ProfileShellLayout from './components/layout/ProfileShellLayout';
-import MainContent from './components/layout/MainContent';
+import HomePage from './pages/home/HomePage';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import VerifyResetOTP from './components/auth/VerifyResetOTP';
@@ -14,27 +14,13 @@ import RegisterPage from './pages/auth/RegisterPage';
 import PostDetailPage from './pages/post/PostDetailPage';
 import './App.css';
 
-function Shell({ children }) {
-  return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_55%)] px-4 py-10">
-      <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6 rounded-2xl border border-sky-100 bg-white/80 px-5 py-4 shadow-sm backdrop-blur">
-          <h1 className="text-2xl font-bold text-slate-900">IT Forum</h1>
-          <p className="mt-1 text-sm text-slate-600">Không gian hỏi đáp và chia sẻ kiến thức công nghệ.</p>
-        </header>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function App() {
   return (
     <Routes>
       {/* Home */}
       <Route element={<ForumLayout />}>
-        <Route index element={<MainContent />} />
-        <Route path="home" element={<MainContent />} />
+        <Route index element={<HomePage />} />
+        <Route path="home" element={<HomePage />} />
       </Route>
 
       {/* Auth */}

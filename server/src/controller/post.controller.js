@@ -158,6 +158,22 @@ class PostController {
             });
         }
     }
+
+    async getTopPosts(req, res) {
+        try {
+            const topPosts = await postService.getTopPosts();
+            res.status(200).json({
+                success: true,
+                message: 'Lấy 10 bài viết hàng đầu thành công',
+                data: topPosts,
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi server khi lấy bài viết hàng đầu',
+            });
+        }
+    }
 }
 
 export default new PostController();

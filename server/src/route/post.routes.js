@@ -9,6 +9,9 @@ const router = express.Router();
 // GET /api/posts — Danh sách + filter (Public)
 router.get('/', postController.getPosts.bind(postController));
 
+// GET /api/posts/top — Top 10 bài viết trong ngày (Public)
+router.get('/top', postController.getTopPosts.bind(postController));
+
 // GET /api/posts/related/:tag — Bài viết liên quan (Public)
 router.get('/related/:tag',
   relatedPostsValidation,
