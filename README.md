@@ -605,10 +605,6 @@ Backend có thể deploy lên Render, Railway, Heroku hoặc VPS Node.js. Khi de
 | `CLOUDINARY_*` | Cấu hình Cloudinary nếu cần upload media lên cloud |
 | `REDIS_URL` | Cấu hình Redis nếu muốn cache saved posts |
 
-## License
-
-Dự án này được phát triển phục vụ mục đích học tập trong khuôn khổ môn **Các nguyên lý và mô hình thiết kế phần mềm** — Trường Đại học Sư phạm Kỹ thuật TP.HCM (HCMUTE).
-
 ## Nhóm Phát Triển
 
 | Họ và tên | MSSV |
