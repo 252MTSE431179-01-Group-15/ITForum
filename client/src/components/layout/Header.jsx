@@ -5,8 +5,9 @@ import { logoutThunk } from '../../store/slices/loginSlice';
 import SearchBar from '../common/SearchBar';
 import CreatePostModal from '../post/CreatePostModal';
 import NotificationBell from '../notification/NotificationBell';
+import { parseSearchQuery, buildSearchParams } from '../../util/filterUtils';
 
-const Header = ({ searchValue = '', onSearchChange, onSearch }) => {
+const Header = ({ searchValue, onSearchChange, onSearch }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.login);
@@ -14,6 +15,40 @@ const Header = ({ searchValue = '', onSearchChange, onSearch }) => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const menuRef = useRef(null);
   const isAdmin = user?.role === 'admin';
+
+  // Quản lý local state tìm kiếm khi component cha không truyền props kiểm soát
+  const [localSearch, setLocalSearch] = useState('');
+  const isControlled = searchValue !== undefined && onSearchChange !== undefined;
+  const currentSearchValue = isControlled ? searchValue : localSearch;
+
+  const handleSearchChange = (val) => {
+    if (isControlled) {
+      onSearchChange(val);
+    } else {
+      setLocalSearch(val);
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    if (isControlled && onSearch) {
+      onSearch();
+    } else {
+      const query = currentSearchValue.trim();
+      if (!query) {
+        navigate('/home');
+        return;
+      }
+      const parsed = parseSearchQuery(query);
+      const searchParamsObj = buildSearchParams({
+        keyword: parsed.keyword,
+        tags: parsed.tags,
+        author: parsed.author,
+        page: 1,
+      });
+      const searchStr = new URLSearchParams(searchParamsObj).toString();
+      navigate(`/home?${searchStr}`);
+    }
+  };
 
   const handleCreatePostClick = () => {
     if (!user) {
@@ -51,9 +86,9 @@ const Header = ({ searchValue = '', onSearchChange, onSearch }) => {
 
         <div className="hidden lg:flex w-[660px] xl:w-[720px] items-center gap-4 justify-center">
           <SearchBar
-            value={searchValue}
-            onChange={onSearchChange}
-            onSearch={onSearch}
+            value={currentSearchValue}
+            onChange={handleSearchChange}
+            onSearch={handleSearchSubmit}
             className="w-full"
             showButton={false}
             inputClassName="bg-surface-container-lowest border-outline-variant rounded-DEFAULT pl-10 pr-4 py-2 font-body-sm text-body-sm focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 text-on-surface placeholder:text-outline shadow-none"
