@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import SafeMarkdown from './SafeMarkdown';
 
 export default function EditHistoryModal({ isOpen, onClose, history = [], type = 'post', title = 'Lịch sử chỉnh sửa' }) {
   useEffect(() => {
@@ -88,9 +89,9 @@ export default function EditHistoryModal({ isOpen, onClose, history = [], type =
                     )}
 
                     {/* Content */}
-                    <p className="text-sm text-on-surface-variant dark:text-slate-300 whitespace-pre-line leading-relaxed break-words font-body-sm">
-                      {item.content}
-                    </p>
+                    <div className="text-sm text-on-surface-variant dark:text-slate-300 font-body-sm">
+                      <SafeMarkdown content={item.content} />
+                    </div>
 
                     {/* Tags */}
                     {type === 'post' && item.tags && item.tags.length > 0 && (
