@@ -12,9 +12,10 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 KEEP_BROWSER_OPEN = True
 
+BASE_URL = "https://it-forum-iota.vercel.app"
 TEST_EMAIL = 'user3@itforum.local'
 TEST_PASSWORD = '123456'
-QUESTION_POST_URL = 'http://localhost:5173/posts/6a364719a1b07db4bbeff7f6'
+QUESTION_POST_URL = f'{BASE_URL}/posts/6a364719a1b07db4bbeff7f6'
 EXPECTED_AUTHOR_NAME = 'Bùi Thị Kim'
 
 options = webdriver.ChromeOptions()
@@ -37,12 +38,12 @@ try:
 
     # Xóa session cũ để tránh dính tài khoản đã đăng nhập từ lần chạy trước.
     driver.delete_all_cookies()
-    driver.get('http://localhost:5173')
+    driver.get(BASE_URL)
     driver.execute_script('window.localStorage.clear(); window.sessionStorage.clear();')
 
     # 1. Đăng nhập bằng thành viên có reputation >= 15
     print('1. Đăng nhập hệ thống...')
-    driver.get('http://localhost:5173/auth/login')
+    driver.get(f'{BASE_URL}/auth/login')
 
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='email']"))
@@ -53,7 +54,7 @@ try:
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
     WebDriverWait(driver, 10).until(
-        lambda d: d.current_url.rstrip('/') in {'http://localhost:5173', 'http://localhost:5173/home'}
+        lambda d: d.current_url.rstrip('/') in {BASE_URL, f'{BASE_URL}/home'} or '/home' in d.current_url
     )
     print('Đăng nhập thành công.')
 

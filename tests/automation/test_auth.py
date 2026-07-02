@@ -9,6 +9,7 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 # 1. Cấu hình Khởi tạo Trình duyệt Chrome
 KEEP_BROWSER_OPEN = True
+BASE_URL = "https://it-forum-iota.vercel.app"
 
 options = webdriver.ChromeOptions()
 
@@ -29,7 +30,7 @@ def wait_before_close(message):
 try:
     # 2. Truy cập trang Đăng nhập
     print("Truy cập trang đăng nhập...")
-    driver.get("http://localhost:5173/auth/login")  # Vite dev server mặc định của dự án
+    driver.get(f"{BASE_URL}/auth/login")  # Vite dev server mặc định của dự án
     time.sleep(2)  # Dừng lại 2 giây để chụp ảnh bước chuẩn bị nhập liệu
 
     # 3. Định vị các phần tử trên Form Đăng nhập và Điền dữ liệu
@@ -54,7 +55,7 @@ try:
     print("Đợi chuyển hướng trang chủ...")
     # Sau login app hiện điều hướng về '/' rồi mới render trang chủ.
     WebDriverWait(driver, 10).until(
-        lambda d: d.current_url.rstrip('/') in {"http://localhost:5173", "http://localhost:5173/home"}
+        lambda d: d.current_url.rstrip('/') in {BASE_URL, f"{BASE_URL}/home"} or "/home" in d.current_url
     )
 
     # Kiểm tra xem có chứa nút "Đăng xuất" hoặc Avatar để chứng tỏ đã đăng nhập thành công

@@ -11,6 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 sys.stdout.reconfigure(encoding='utf-8')
 
 KEEP_BROWSER_OPEN = True
+BASE_URL = "https://it-forum-iota.vercel.app"
 
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
@@ -31,7 +32,7 @@ try:
     
     # 1. Đăng nhập trước
     print("1. Đăng nhập hệ thống...")
-    driver.get("http://localhost:5173/auth/login")
+    driver.get(f"{BASE_URL}/auth/login")
     
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='email']"))
@@ -42,14 +43,14 @@ try:
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
     
     WebDriverWait(driver, 10).until(
-        lambda d: d.current_url.rstrip('/') == "http://localhost:5173" or "/home" in d.current_url
+        lambda d: d.current_url.rstrip('/') in {BASE_URL, f"{BASE_URL}/home"} or "/home" in d.current_url
     )
     print("Đăng nhập thành công.")
     time.sleep(1)
 
     # 2. Truy cập trang cá nhân
     print("2. Chuyển sang trang cá nhân...")
-    driver.get("http://localhost:5173/user/profile")
+    driver.get(f"{BASE_URL}/user/profile")
     time.sleep(2)
 
     # 3. Click nút "Chỉnh sửa hồ sơ"
