@@ -25,6 +25,7 @@ function FilterSidebar({ filters, onFilterChange, onApply, onClear, embed = fals
   const tagCollection = useSelector((state) => state.tags?.collections?.filterTags || DEFAULT_TAG_COLLECTION);
   const tagOptions = tagCollection.items || [];
   const loadingTags = tagCollection.loading;
+  const fetchedTags = tagCollection.fetched;
   const tagPagination = tagCollection.pagination || { page: 1, totalPages: 0 };
   const hasMoreTags = tagPagination.totalPages
     ? tagPagination.page < tagPagination.totalPages
@@ -82,7 +83,7 @@ function FilterSidebar({ filters, onFilterChange, onApply, onClear, embed = fals
   };
 
   useEffect(() => {
-    if (!tagOptions.length && !loadingTags) {
+    if (!fetchedTags && !loadingTags) {
       dispatch(
         fetchTagsThunk({
           key: 'filterTags',
@@ -91,7 +92,7 @@ function FilterSidebar({ filters, onFilterChange, onApply, onClear, embed = fals
         })
       );
     }
-  }, [dispatch, loadingTags, tagLimit, tagOptions.length]);
+  }, [dispatch, loadingTags, tagLimit, fetchedTags]);
 
   useEffect(() => {
     const keyword = (filters.author || '').trim();
@@ -138,7 +139,7 @@ function FilterSidebar({ filters, onFilterChange, onApply, onClear, embed = fals
   }, []);
 
   useEffect(() => {
-    if (loadingTags || !hasMoreTags) return;
+    if (loadingTags || !hasMoreTags || tagOptions.length === 0) return;
     const container = tagListRef.current;
     if (!container) return;
 

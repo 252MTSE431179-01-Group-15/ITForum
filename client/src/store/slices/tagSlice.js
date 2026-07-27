@@ -5,6 +5,7 @@ import { adminCreateTag, adminUpdateTag, adminDeleteTag } from '../../services/u
 const DEFAULT_COLLECTION = {
   items: [],
   loading: false,
+  fetched: false,
   error: null,
   pagination: {
     total: 0,
@@ -112,6 +113,7 @@ const tagSlice = createSlice({
         const { key, append, data, pagination } = action.payload;
         const collection = ensureCollection(state, key);
         collection.loading = false;
+        collection.fetched = true;
         collection.pagination = pagination || DEFAULT_COLLECTION.pagination;
 
         if (append) {
@@ -128,6 +130,7 @@ const tagSlice = createSlice({
         const { key, message } = action.payload || {};
         const collection = ensureCollection(state, key || 'default');
         collection.loading = false;
+        collection.fetched = true;
         collection.error = message || 'Không thể tải danh sách tags.';
         if (!collection.items?.length) {
           collection.items = [];

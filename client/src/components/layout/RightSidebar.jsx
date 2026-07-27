@@ -16,12 +16,13 @@ const RightSidebar = ({ filters, onFilterChange, onApply, onClear }) => {
     const tagCollection = useSelector((state) => state.tags?.collections?.sidebarTags || DEFAULT_TAG_COLLECTION);
     const tags = tagCollection.items || [];
     const loadingTags = tagCollection.loading;
+    const fetchedTags = tagCollection.fetched;
 
     useEffect(() => {
-        if (!tags.length && !loadingTags) {
+        if (!fetchedTags && !loadingTags) {
             dispatch(fetchTagsThunk({ key: 'sidebarTags', params: { limit: 8, page: 1, sortBy: 'posts' } }));
         }
-    }, [dispatch, loadingTags, tags.length]);
+    }, [dispatch, loadingTags, fetchedTags]);
 
     const visibleTags = [...tags].sort(
         (left, right) => (Number(right.totalCount) || 0) - (Number(left.totalCount) || 0)
