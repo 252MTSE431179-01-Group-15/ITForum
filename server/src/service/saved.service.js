@@ -58,7 +58,7 @@ class SavedService {
         const postIds = await savedPostRepository.findPostIdsByCollection(userId, collectionId);
         await savedPostRepository.removeCollectionPosts(userId, collectionId);
         await savedCollectionRepository.deleteCollection(collectionId);
-        this._updateSavedIdsCache(userId, postIds, false).catch(() => {});
+        this._updateSavedIdsCache(userId, postIds, false).catch(() => { });
 
         return { deletedCollectionId: collectionId, removedCount: postIds.length };
     }
@@ -84,7 +84,7 @@ class SavedService {
             if (existing.collection.toString() !== targetCollection._id.toString()) {
                 await savedPostRepository.moveSavedPosts(userId, [postId], targetCollection._id);
             }
-            this._updateSavedIdsCache(userId, postId, true).catch(() => {});
+            this._updateSavedIdsCache(userId, postId, true).catch(() => { });
             return { saved: true, collectionId: targetCollection._id };
         }
 
@@ -94,20 +94,20 @@ class SavedService {
             collection: targetCollection._id,
         });
 
-        this._updateSavedIdsCache(userId, postId, true).catch(() => {});
+        this._updateSavedIdsCache(userId, postId, true).catch(() => { });
         return { saved: true, collectionId: targetCollection._id };
     }
 
     async removeSavedPost(userId, postId) {
         const removed = await savedPostRepository.removeSavedPost(userId, postId);
-        this._updateSavedIdsCache(userId, postId, false).catch(() => {});
+        this._updateSavedIdsCache(userId, postId, false).catch(() => { });
 
         return { removed: Boolean(removed) };
     }
 
     async removeSavedPosts(userId, postIds) {
         await savedPostRepository.removeSavedPosts(userId, postIds);
-        this._updateSavedIdsCache(userId, postIds, false).catch(() => {});
+        this._updateSavedIdsCache(userId, postIds, false).catch(() => { });
 
         return { removedCount: postIds.length };
     }
