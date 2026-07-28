@@ -83,7 +83,9 @@ const connectDB = async () => {
 
     return conn
   } catch (error) {
-    console.error('❌ MongoDB connection failed:', error.message)
+    console.error('❌ MongoDB connection failed:', error.message || error)
+    console.error('❌ Full error details:', error)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
     process.exit(1) // Dừng server nếu không kết nối được DB
   }
 }

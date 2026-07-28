@@ -35,6 +35,7 @@ const startServer = async () => {
     })
   } catch (error) {
     console.error('❌ Không thể khởi động server:', error)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
     process.exit(1)
   }
 }
