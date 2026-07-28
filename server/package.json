@@ -4,7 +4,7 @@
   "description": "Backend API cho IT Student Forum - ExpressJS + Mongoose",
   "main": "server.js",
   "scripts": {
-    "start": "npx babel-node server.js",
+    "start": "babel-node server.js",
     "dev": "npx nodemon --exec npx babel-node server.js",
     "seed:sidebar": "npx babel-node src/scripts/seedSidebarData.js",
     "seed:demo": "npx babel-node src/scripts/resetAndSeedDemoData.js"
@@ -14,6 +14,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/node": "^7.29.0",
+    "@babel/preset-env": "^7.29.5",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -30,9 +33,6 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/node": "^7.29.0",
-    "@babel/preset-env": "^7.29.5",
     "nodemon": "^3.1.14"
   }
 }
