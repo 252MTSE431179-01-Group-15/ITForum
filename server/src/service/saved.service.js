@@ -145,7 +145,8 @@ class SavedService {
                 if (cached) {
                     return JSON.parse(cached);
                 }
-            } catch {
+            } catch (err) {
+                console.warn('[Redis Cache] read failed:', err.message);
                 // Redis unavailable at runtime -> fallback to DB
             }
         }

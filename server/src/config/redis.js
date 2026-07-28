@@ -10,10 +10,13 @@ let redisErrorLogged = false;
 const connectRedis = async () => {
     if (redisImportFailed) return null;
     const { createClient } = await import('redis');
+    const isRedissTLS = env.REDIS_URL.startsWith('rediss://');
+    console.log(`[Redis] Connecting to ${isRedissTLS ? 'TLS' : 'plain'} Redis...`);
     redisClient = createClient({
         url: env.REDIS_URL,
         socket: {
-            connectTimeout: 5000,
+            tls: isRedissTLS,
+            connectTimeout: 10000,
             reconnectStrategy: (retries) => Math.min(retries * 500, 3000),
         },
     });
