@@ -2,10 +2,10 @@ import axios from 'axios';
 
 // Mặc định dùng đường dẫn tương đối /api để Vite proxy sang backend localhost:5000.
 // Nhờ vậy chỉ cần public frontend bằng 1 lệnh: ngrok http 5173.
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api').trim().replace(/\/+$/, '');
 const normalizedBaseUrl = rawBaseUrl.endsWith('/api')
   ? rawBaseUrl
-  : `${rawBaseUrl.replace(/\/+$/, '')}/api`;
+  : `${rawBaseUrl}/api`;
 
 const apiClient = axios.create({
   baseURL: normalizedBaseUrl,
