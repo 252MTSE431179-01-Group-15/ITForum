@@ -44,16 +44,20 @@ const syncAuthorActiveStatus = async () => {
 
 const connectDB = async () => {
   try {
-    // --- Kết nối MongoDB (Local hoặc Cloud tùy .env) ---
     let conn
+    const options = {
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+      family: 4
+    }
     try {
-      conn = await mongoose.connect(env.MONGODB_URI)
+      conn = await mongoose.connect(env.MONGODB_URI, options)
     } catch (error) {
       if (error.message && (error.message.includes('querySrv ECONNREFUSED') || error.message.includes('ENOTFOUND'))) {
-        console.warn('⚠️ Lỗi phân giải DNS cho MongoDB Atlas. Đang thử lại với DNS của Google/Cloudflare...')
+        console.warn('⚠️ Lỗi phân giải DNS cho MongoDB Atlas. Đang thử lại kết nối...')
         const dns = await import('dns')
-        dns.setServers(['8.8.8.8', '1.1.1.1'])
-        conn = await mongoose.connect(env.MONGODB_URI)
+        try { dns.setServers(['8.8.8.8', '1.1.1.1']) } catch (e) {}
+        conn = await mongoose.connect(env.MONGODB_URI, options)
       } else {
         throw error
       }
