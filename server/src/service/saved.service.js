@@ -151,16 +151,18 @@ class SavedService {
         }
 
         const ids = await savedPostRepository.findPostIdsByUser(userId);
+        const idsAsStrings = (ids || []).map((id) => String(id));
 
         if (client) {
             try {
-                await client.set(cacheKey, JSON.stringify(ids), { EX: SAVED_IDS_TTL_SECONDS });
-            } catch {
-                // Ignore cache write failure
+                await client.set(cacheKey, JSON.stringify(idsAsStrings), { EX: SAVED_IDS_TTL_SECONDS });
+                console.log(`✅ [Redis Cache] Key "${cacheKey}" created with ${idsAsStrings.length} IDs.`);
+            } catch (err) {
+                console.warn('[Redis Cache] write failed:', err.message);
             }
         }
 
-        return ids;
+        return idsAsStrings;
     }
 
     async _getCollectionForUser(userId, collectionId) {
@@ -171,31 +173,18 @@ class SavedService {
         return collection;
     }
 
-    async _updateSavedIdsCache(userId, postIdOrIds, isAdd) {
+    async _updateSavedIdsCache(userId) {
         const client = await getRedisClient();
         if (!client) return;
 
         const cacheKey = buildSavedIdsCacheKey(userId);
-        let cached = null;
         try {
-            cached = await client.get(cacheKey);
-        } catch {
-            return;
-        }
-        if (!cached) return;
-
-        const ids = new Set(JSON.parse(cached));
-        const targetIds = Array.isArray(postIdOrIds) ? postIdOrIds : [postIdOrIds];
-
-        targetIds.forEach((id) => {
-            if (isAdd) ids.add(String(id));
-            else ids.delete(String(id));
-        });
-
-        try {
-            await client.set(cacheKey, JSON.stringify([...ids]), { EX: SAVED_IDS_TTL_SECONDS });
-        } catch {
-            // Ignore cache update failure
+            const currentPostIds = await savedPostRepository.findPostIdsByUser(userId);
+            const idsAsStrings = (currentPostIds || []).map((id) => String(id));
+            await client.set(cacheKey, JSON.stringify(idsAsStrings), { EX: SAVED_IDS_TTL_SECONDS });
+            console.log(`✅ [Redis Cache] Updated key "${cacheKey}" with ${idsAsStrings.length} IDs.`);
+        } catch (error) {
+            console.warn('[Redis Cache] failed to update saved ids cache:', error.message);
         }
     }
 }
