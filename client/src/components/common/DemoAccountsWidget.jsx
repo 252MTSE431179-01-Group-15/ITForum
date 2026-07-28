@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useToast } from '../../context/ToastContext';
 
 const DEMO_ACCOUNTS = [
   {
@@ -12,19 +11,19 @@ const DEMO_ACCOUNTS = [
     role: 'User',
     name: 'Nguyễn Văn An',
     email: 'user1@itforum.local',
-    badgeColor: 'bg-blue-100 text-blue-700 border-blue-200',
+    badgeColor: 'bg-slate-100 text-slate-600 border-slate-200',
   },
   {
     role: 'User',
     name: 'Trần Thị Bình',
     email: 'user2@itforum.local',
-    badgeColor: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    badgeColor: 'bg-slate-100 text-slate-600 border-slate-200',
   },
   {
     role: 'User',
     name: 'Lê Hoàng Cường',
     email: 'user3@itforum.local',
-    badgeColor: 'bg-amber-100 text-amber-700 border-amber-200',
+    badgeColor: 'bg-slate-100 text-slate-600 border-slate-200',
   },
 ];
 
@@ -33,12 +32,10 @@ const COMMON_PASSWORD = '123456';
 export default function DemoAccountsWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [copiedKey, setCopiedKey] = useState('');
-  const { toast } = useToast();
 
   const handleCopy = (text, label) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(label);
-    toast.success(`Đã chép ${label}`);
     setTimeout(() => setCopiedKey(''), 1500);
   };
 
@@ -88,7 +85,7 @@ export default function DemoAccountsWidget() {
               <span className="material-symbols-outlined text-xs">
                 {copiedKey === 'Mật khẩu' ? 'check' : 'content_copy'}
               </span>
-              <span>Chép</span>
+              <span>{copiedKey === 'Mật khẩu' ? 'Đã chép' : 'Chép'}</span>
             </button>
           </div>
 
@@ -114,7 +111,7 @@ export default function DemoAccountsWidget() {
                     className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                     title="Sao chép Email"
                   >
-                    <span className="material-symbols-outlined text-xs">
+                    <span className="material-symbols-outlined text-xs text-slate-500">
                       {copiedKey === acc.email ? 'check' : 'content_copy'}
                     </span>
                   </button>
