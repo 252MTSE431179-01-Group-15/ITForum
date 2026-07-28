@@ -393,7 +393,7 @@ const MainContent = () => {
     const [freeVotesModalOpen, setFreeVotesModalOpen] = useState(false);
 
     const totalTrendingPages = useMemo(() => trending.length ? Math.ceil(trending.length / pageSize) : 0, [trending.length, pageSize]);
-    const savedIdSet = useMemo(() => new Set(savedIds), [savedIds]);
+    const savedIdSet = useMemo(() => new Set((savedIds || []).map(String)), [savedIds]);
 
     const handleToggleSave = async (postId, isSaved) => {
         if (!isAuthenticated) return navigate('/auth/login');

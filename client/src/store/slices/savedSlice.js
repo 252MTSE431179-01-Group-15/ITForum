@@ -102,13 +102,16 @@ export const toggleSaveThunk = createAsyncThunk(
   'saved/toggleSave',
   async (postId, { getState, rejectWithValue }) => {
     try {
+      const targetStrId = String(postId);
       const { ids } = getState().saved;
-      if (ids.includes(postId)) {
-        await removeSavedPost(postId);
-        return { postId, saved: false };
+      const currentlySaved = (ids || []).some((id) => String(id) === targetStrId);
+
+      if (currentlySaved) {
+        await removeSavedPost(targetStrId);
+        return { postId: targetStrId, saved: false };
       }
-      await savePost(postId);
-      return { postId, saved: true };
+      await savePost(targetStrId);
+      return { postId: targetStrId, saved: true };
     } catch (error) {
       return rejectWithValue(extractError(error));
     }
@@ -119,8 +122,9 @@ export const savePostToCollectionThunk = createAsyncThunk(
   'saved/saveToCollection',
   async ({ postId, collectionId }, { rejectWithValue }) => {
     try {
-      await savePost(postId, collectionId || undefined);
-      return { postId };
+      const targetStrId = String(postId);
+      await savePost(targetStrId, collectionId || undefined);
+      return { postId: targetStrId };
     } catch (error) {
       return rejectWithValue(extractError(error));
     }
@@ -165,7 +169,7 @@ const savedSlice = createSlice({
       })
       .addCase(fetchSavedIdsThunk.fulfilled, (state, action) => {
         state.loadingIds = false;
-        state.ids = action.payload;
+        state.ids = (action.payload || []).map(String);
       })
       .addCase(fetchSavedIdsThunk.rejected, (state, action) => {
         state.loadingIds = false;
@@ -208,54 +212,36 @@ const savedSlice = createSlice({
         state.loadingPosts = false;
         state.error = action.payload;
       })
-      .addCase(toggleSaveThunk.pending, (state, action) => {
+      .addCase(toggleSaveThunk.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
-        const postId = action.meta.arg;
-        if (postId) {
-          if (state.ids.includes(postId)) {
-            state.ids = state.ids.filter((id) => id !== postId);
-          } else {
-            state.ids = [...state.ids, postId];
-          }
-        }
       })
       .addCase(toggleSaveThunk.fulfilled, (state, action) => {
         state.actionLoading = false;
         const { postId, saved } = action.payload;
+        const targetStrId = String(postId);
         if (saved) {
-          if (!state.ids.includes(postId)) {
-            state.ids = [...state.ids, postId];
+          if (!state.ids.some((id) => String(id) === targetStrId)) {
+            state.ids = [...state.ids, targetStrId];
           }
         } else {
-          state.ids = state.ids.filter((id) => id !== postId);
+          state.ids = state.ids.filter((id) => String(id) !== targetStrId);
         }
       })
       .addCase(toggleSaveThunk.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload;
-        const postId = action.meta.arg;
-        if (postId) {
-          if (state.ids.includes(postId)) {
-            state.ids = state.ids.filter((id) => id !== postId);
-          } else {
-            state.ids = [...state.ids, postId];
-          }
-        }
       })
-      .addCase(savePostToCollectionThunk.pending, (state, action) => {
+      .addCase(savePostToCollectionThunk.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
-        const { postId } = action.meta.arg || {};
-        if (postId && !state.ids.includes(postId)) {
-          state.ids = [...state.ids, postId];
-        }
       })
       .addCase(savePostToCollectionThunk.fulfilled, (state, action) => {
         state.actionLoading = false;
         const { postId } = action.payload;
-        if (!state.ids.includes(postId)) {
-          state.ids = [...state.ids, postId];
+        const targetStrId = String(postId);
+        if (!state.ids.some((id) => String(id) === targetStrId)) {
+          state.ids = [...state.ids, targetStrId];
         }
       })
       .addCase(savePostToCollectionThunk.rejected, (state, action) => {
