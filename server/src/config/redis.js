@@ -4,7 +4,7 @@ let redisClient = null;
 let redisConnecting = null;
 let redisImportFailed = false;
 let redisRetryAfter = 0;
-const REDIS_RETRY_DELAY_MS = 300000; // 5 minutes retry delay if down
+const REDIS_RETRY_DELAY_MS = 60000; // 1 minute retry delay if down
 let redisErrorLogged = false;
 
 const connectRedis = async () => {
@@ -13,8 +13,8 @@ const connectRedis = async () => {
     redisClient = createClient({
         url: env.REDIS_URL,
         socket: {
-            connectTimeout: 200, // Reduced from 800ms
-            reconnectStrategy: () => false,
+            connectTimeout: 5000,
+            reconnectStrategy: (retries) => Math.min(retries * 500, 3000),
         },
     });
 
@@ -27,6 +27,7 @@ const connectRedis = async () => {
 
     await redisClient.connect();
     redisErrorLogged = false;
+    console.log('✅ Connected to Cloud Redis successfully.');
     return redisClient;
 };
 
@@ -53,7 +54,7 @@ export const getRedisClient = async () => {
 
     const client = await Promise.race([
         redisConnecting,
-        new Promise((resolve) => setTimeout(() => resolve(null), 250)), // Reduced from 900ms
+        new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
     ]);
     redisConnecting = null;
     if (!client) return null;
