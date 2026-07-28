@@ -193,6 +193,7 @@ export default function PostDetailPage() {
 
     if (isSaved) {
       dispatch(toggleSaveThunk(post._id));
+      toast.info('Đã xóa bài viết khỏi thư mục lưu trữ');
       return;
     }
 
@@ -201,10 +202,15 @@ export default function PostDetailPage() {
   };
 
   const handleConfirmSaveToCollection = async () => {
-    await dispatch(savePostToCollectionThunk({
-      postId: post._id,
-      collectionId: selectedCollectionId || null,
-    }));
+    try {
+      await dispatch(savePostToCollectionThunk({
+        postId: post._id,
+        collectionId: selectedCollectionId || null,
+      })).unwrap();
+      toast.success('Đã lưu bài viết vào thư mục lưu trữ!');
+    } catch (err) {
+      toast.error(err || 'Không thể lưu bài viết');
+    }
     setSaveModalOpen(false);
     setSelectedCollectionId('');
   };

@@ -23,11 +23,14 @@ import DonateResultPage from './pages/donate/DonateResultPage';
 import TagsPage from './pages/tags/TagsPage';
 import ReportHistoryPage from './pages/report/ReportHistoryPage';
 import TrashPage from './pages/trash/TrashPage';
+import DemoAccountsWidget from './components/common/DemoAccountsWidget';
 import './App.css';
 
 function App() {
   return (
-    <Routes>
+    <>
+      <DemoAccountsWidget />
+      <Routes>
       <Route element={<ForumLayout />}>
         <Route index element={<MainContent />} />
         <Route path="home" element={<MainContent />} />
@@ -75,6 +78,7 @@ function App() {
 
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
+  </>
   );
 }
 

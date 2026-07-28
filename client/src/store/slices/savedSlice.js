@@ -208,9 +208,17 @@ const savedSlice = createSlice({
         state.loadingPosts = false;
         state.error = action.payload;
       })
-      .addCase(toggleSaveThunk.pending, (state) => {
+      .addCase(toggleSaveThunk.pending, (state, action) => {
         state.actionLoading = true;
         state.error = null;
+        const postId = action.meta.arg;
+        if (postId) {
+          if (state.ids.includes(postId)) {
+            state.ids = state.ids.filter((id) => id !== postId);
+          } else {
+            state.ids = [...state.ids, postId];
+          }
+        }
       })
       .addCase(toggleSaveThunk.fulfilled, (state, action) => {
         state.actionLoading = false;
@@ -226,10 +234,22 @@ const savedSlice = createSlice({
       .addCase(toggleSaveThunk.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload;
+        const postId = action.meta.arg;
+        if (postId) {
+          if (state.ids.includes(postId)) {
+            state.ids = state.ids.filter((id) => id !== postId);
+          } else {
+            state.ids = [...state.ids, postId];
+          }
+        }
       })
-      .addCase(savePostToCollectionThunk.pending, (state) => {
+      .addCase(savePostToCollectionThunk.pending, (state, action) => {
         state.actionLoading = true;
         state.error = null;
+        const { postId } = action.meta.arg || {};
+        if (postId && !state.ids.includes(postId)) {
+          state.ids = [...state.ids, postId];
+        }
       })
       .addCase(savePostToCollectionThunk.fulfilled, (state, action) => {
         state.actionLoading = false;

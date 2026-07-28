@@ -395,13 +395,17 @@ const MainContent = () => {
     const totalTrendingPages = useMemo(() => trending.length ? Math.ceil(trending.length / pageSize) : 0, [trending.length, pageSize]);
     const savedIdSet = useMemo(() => new Set(savedIds), [savedIds]);
 
-    const handleToggleSave = (postId, isSaved) => {
+    const handleToggleSave = async (postId, isSaved) => {
         if (!isAuthenticated) return navigate('/auth/login');
         if (isAdmin) {
             toast.warning('Quản trị viên không được phép thực hiện tương tác này.');
             return;
         }
-        if (isSaved) return dispatch(toggleSaveThunk(postId));
+        if (isSaved) {
+            dispatch(toggleSaveThunk(postId));
+            toast.info('Đã xóa bài viết khỏi thư mục lưu trữ');
+            return;
+        }
         setSavePostId(postId);
         setSaveModalOpen(true);
         dispatch(fetchCollectionsThunk());
@@ -463,7 +467,12 @@ const MainContent = () => {
 
     const handleConfirmSaveToCollection = async () => {
         if (!savePostId) return;
-        await dispatch(savePostToCollectionThunk({ postId: savePostId, collectionId: selectedCollectionId || null }));
+        try {
+            await dispatch(savePostToCollectionThunk({ postId: savePostId, collectionId: selectedCollectionId || null })).unwrap();
+            toast.success('Đã lưu bài viết vào thư mục lưu trữ!');
+        } catch (err) {
+            toast.error(err || 'Không thể lưu bài viết');
+        }
         setSaveModalOpen(false);
         setSavePostId(null);
         setSelectedCollectionId('');
